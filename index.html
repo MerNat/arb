@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbitrage Betting Calculator</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .bookmaker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bookmaker label,
+        .bookmaker input {
+            margin: 5px;
+        }
+
+        button {
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function calculateArbitrage() {
+            var oddsA1 = parseFloat(document.getElementById('oddsA1').value);
+            var oddsB1 = parseFloat(document.getElementById('oddsB1').value);
+            var oddsA2 = parseFloat(document.getElementById('oddsA2').value);
+            var oddsB2 = parseFloat(document.getElementById('oddsB2').value);
+            var stake = parseFloat(document.getElementById('stake').value);
+
+            var bestOddsA = Math.max(oddsA1, oddsA2);
+            var bestOddsB = Math.max(oddsB1, oddsB2);
+
+            var impliedProbabilityA = 1 / bestOddsA;
+            var impliedProbabilityB = 1 / bestOddsB;
+
+            var arbitragePercentage = (impliedProbabilityA + impliedProbabilityB) * 100;
+
+            var stakeA = stake * (impliedProbabilityA / (impliedProbabilityA + impliedProbabilityB));
+            var stakeB = stake * (impliedProbabilityB / (impliedProbabilityA + impliedProbabilityB));
+
+            var placeStakeA = bestOddsA === oddsA1 ? "Bookmaker 1" : "Bookmaker 2";
+            var placeStakeB = bestOddsB === oddsB1 ? "Bookmaker 1" : "Bookmaker 2";
+
+            var sameBookmaker = placeStakeA === placeStakeB;
+
+            var isArbitrage = arbitragePercentage < 100 && !sameBookmaker;
+
+            var resultsHTML = 'Arbitrage Percentage: ' + arbitragePercentage.toFixed(2) + '%. Same Bookmaker: ' + sameBookmaker + '<br>';
+
+            if (!isArbitrage) {
+                resultsHTML += 'No arbitrage opportunity.';
+            } else {
+                var stakeA = stake * (impliedProbabilityA / (impliedProbabilityA + impliedProbabilityB));
+                var stakeB = stake * (impliedProbabilityB / (impliedProbabilityA + impliedProbabilityB));
+
+                resultsHTML += 'Stake for Team A: $' + stakeA.toFixed(2) + ' at ' + placeStakeA + '<br>' +
+                    'Stake for Team B: $' + stakeB.toFixed(2) + ' at ' + placeStakeB + '<br>' +
+                    'Arbitrage opportunity exists.';
+            }
+
+            document.getElementById('results').innerHTML = resultsHTML;
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Arbitrage Betting Calculator</h1>
+    <div class="container">
+        <div class="bookmaker">
+            <h2>Bookmaker 1</h2>
+            <label for="oddsA1">Team A Odds:</label>
+            <input type="number" id="oddsA1" step="0.01" required>
+            <label for="oddsB1">Team B Odds:</label>
+            <input type="number" id="oddsB1" step="0.01" required>
+        </div>
+        <div class="bookmaker">
+            <h2>Bookmaker 2</h2>
+            <label for="oddsA2">Team A Odds:</label>
+            <input type="number" id="oddsA2" step="0.01" required>
+            <label for="oddsB2">Team B Odds:</label>
+            <input type="number" id="oddsB2" step="0.01" required>
+        </div>
+    </div>
+    <label for="stake">Your Stake ($):</label>
+    <input type="number" id="stake" step="0.01" required>
+    <button onclick="calculateArbitrage()">Calculate Arbitrage</button>
+    <div id="results"></div>
+</body>
+
+</html>
